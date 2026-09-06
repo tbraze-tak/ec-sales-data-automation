@@ -1,0 +1,82 @@
+{
+  "contract_version": "1.0.0",
+  "currency": "JPY",
+  "timezone": "Asia/Tokyo",
+  "sources": {
+    "north_market": {
+      "display_name": "North Market",
+      "file_pattern": "north_market*.csv",
+      "encoding": "utf-8-sig",
+      "date_formats": ["%Y-%m-%d"],
+      "columns": {
+        "order_no": "order_id",
+        "order_date": "order_date",
+        "status": "order_status",
+        "sku": "product_id",
+        "item": "product_name",
+        "qty": "quantity",
+        "unit_price": "unit_price",
+        "discount": "discount_amount",
+        "shipping": "shipping_amount",
+        "tax": "tax_amount"
+      },
+      "required": ["order_no", "order_date", "status", "sku", "item", "qty", "unit_price"],
+      "status_map": {
+        "paid": "completed",
+        "shipped": "completed",
+        "cancelled": "cancelled",
+        "refunded": "refunded"
+      }
+    },
+    "sakura_mall": {
+      "display_name": "Sakura Mall",
+      "file_pattern": "sakura_mall*.csv",
+      "encoding": "utf-8-sig",
+      "date_formats": ["%Y/%m/%d"],
+      "columns": {
+        "注文番号": "order_id",
+        "注文日": "order_date",
+        "状態": "order_status",
+        "商品コード": "product_id",
+        "商品名": "product_name",
+        "個数": "quantity",
+        "販売単価": "unit_price",
+        "クーポン": "discount_amount",
+        "送料": "shipping_amount",
+        "消費税": "tax_amount"
+      },
+      "required": ["注文番号", "注文日", "状態", "商品コード", "商品名", "個数", "販売単価"],
+      "status_map": {
+        "発送済": "completed",
+        "入金済": "completed",
+        "キャンセル": "cancelled",
+        "返金": "refunded"
+      }
+    },
+    "harbor_shop": {
+      "display_name": "Harbor Shop",
+      "file_pattern": "harbor_shop*.csv",
+      "encoding": "utf-8-sig",
+      "date_formats": ["%Y-%m-%dT%H:%M:%S%z"],
+      "columns": {
+        "id": "order_id",
+        "created_at": "order_date",
+        "state": "order_status",
+        "product_code": "product_id",
+        "description": "product_name",
+        "units": "quantity",
+        "price_jpy": "unit_price",
+        "discount_jpy": "discount_amount",
+        "delivery_jpy": "shipping_amount",
+        "tax_jpy": "tax_amount"
+      },
+      "required": ["id", "created_at", "state", "product_code", "description", "units", "price_jpy"],
+      "status_map": {
+        "fulfilled": "completed",
+        "paid": "completed",
+        "void": "cancelled",
+        "refunded": "refunded"
+      }
+    }
+  }
+}

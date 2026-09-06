@@ -1,0 +1,20 @@
+.DS_Store
+.venv/
+node_modules
+__pycache__/
+.pytest_cache/
+.coverage
+htmlcov/
+dist/
+build/
+*.egg-info/
+
+# Runtime-generated artifacts
+input/
+output/
+outputs/
+
+# Local secrets and configuration
+.env
+.env.*
+!.env.example
