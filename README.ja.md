@@ -2,6 +2,8 @@
 
 [English / 英語](README.md)
 
+現在の状態：Phase 27完了（ローカルReleaseパッケージと公開準備監査まで完了、未公開）
+
 列名、日付形式、ステータス表現が異なる複数店舗のCSVを、共通形式へ変換して集計するポートフォリオです。開発・デモには完全合成データだけを使用しています。
 
 ![日本語サマリー](docs/assets/sample_summary_ja.png)
@@ -75,3 +77,7 @@ PYTHONPATH=src python3 -m unittest discover -s tests -v
 ```
 
 Python 3.11〜3.13向けのCI設定も含まれています。
+
+## 公開成果物
+
+`v0.1.0`では日本語版・英語版Excelを同梱する想定です。リポジトリには生成Excelをコミットせず、公開時にRelease添付ファイルとして提供します。チェックサム付きのローカルReleaseパッケージは `scripts/package_release.sh` で作成できます。

@@ -95,7 +95,7 @@ Status: complete
 
 Completed:
 
-- Audited 36 publication candidates for secrets, personal paths, real email addresses, unsafe symlinks, and oversized files; no findings remained.
+- Audited 38 publication candidates for secrets, personal paths, real email addresses, unsafe symlinks, and oversized files; no findings remained.
 - Kept English canonical fields and implementation identifiers while adding separate Japanese and English workbook presentations.
 - Generated both workbooks from the same `report_model.json` and verified identical reconciliation totals.
 - Inspected all seven rendered sheets in each locale and found no layout-blocking defects.
@@ -112,7 +112,22 @@ Phase 26 may create the first local commit after an explicit user request. Remot
 Status: complete
 
 - User explicitly requested progression to Phase 26.
-- The complete first-commit candidate set will be staged and reviewed before committing.
-- Automated tests, clean-install verification, and the publication audit must pass immediately before the commit.
-- This phase creates a local commit only; it does not configure a remote, publish the repository, create a release, or upload workbook artifacts.
+- The complete first-commit candidate set was staged and reviewed before committing.
+- Automated tests, clean-install verification, and the publication audit passed immediately before the commit.
+- This phase created a local commit only; it did not configure a remote, publish the repository, create a release, or upload workbook artifacts.
 - The audited candidate set was recorded in the first local commit on `main`.
+
+## Phase 27 — local release readiness
+
+Status: complete
+
+- Added public package metadata, an English landing README, a changelog, and `v0.1.0` release notes.
+- Documented suggested repository description and topics without creating a remote repository.
+- Added a deterministic local release-packaging workflow for the Japanese and English workbooks.
+- Added checksum generation and verification for release attachments.
+- Audited both the current publication candidates and every committed Git blob.
+- Prepared the release bundle locally under ignored `outputs/`; no tag, release, upload, or publication was performed.
+
+## Next phase
+
+Phase 28 requires explicit direction for any external action: choose the Git hosting destination and visibility, configure a remote, push, create tag `v0.1.0`, create the release, and upload the verified attachments.

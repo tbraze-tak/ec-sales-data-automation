@@ -9,6 +9,7 @@ ROOT = Path(__file__).resolve().parents[1]
 EXCLUDED_PARTS = {".git", ".venv", "node_modules", "outputs", "output", "__pycache__", ".pytest_cache"}
 TEXT_SUFFIXES = {".md", ".py", ".json", ".toml", ".yml", ".yaml", ".sh", ".txt", ".csv", ".gitignore"}
 MAX_PUBLIC_FILE_BYTES = 5 * 1024 * 1024
+AUDIT_SOURCE_FILES = {"audit_publication.py", "audit_git_history.py"}
 
 PATTERNS = {
     "absolute_user_path": re.compile(r"/Users/[^/\s]+/"),
@@ -31,7 +32,7 @@ def main() -> int:
     findings: list[str] = []
     checked = 0
     for path in candidates():
-        if path.resolve() == Path(__file__).resolve():
+        if path.parent == Path(__file__).parent and path.name in AUDIT_SOURCE_FILES:
             continue
         checked += 1
         relative = path.relative_to(ROOT)

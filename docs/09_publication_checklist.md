@@ -10,7 +10,8 @@
 - [x] Data-safety policy added
 - [x] Review staged files before the first commit
 - [x] Confirm no existing commit history is present before the first commit
-- [ ] Scan the complete Git history again immediately before making the repository public
+- [x] Add and run a complete committed-blob history scanner
+- [ ] Run the complete Git-history scan again immediately before making the repository public
 
 ## Demonstration content
 
@@ -21,6 +22,7 @@
 - [x] Japanese and English summary images
 - [x] Japanese and English workbooks generated from one report model
 - [x] Reconciliation totals documented
+- [x] Local `v0.1.0` release bundle with SHA-256 checksums
 - [ ] Add a short terminal demonstration or GIF if it improves the portfolio listing
 
 ## Engineering quality
@@ -34,6 +36,7 @@
 - [x] Separate the portable Python core from development-only workbook generation
 - [x] Run installation and sample generation from an isolated clean copy
 - [x] Add CI for Python 3.11–3.13
+- [x] Add package metadata, changelog, and release notes
 
 ## Claims and legal review
 

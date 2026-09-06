@@ -17,6 +17,8 @@ The Codex weekly usage window reached 98% used, so work was initially stopped be
 - Phase 23: eight tests, security/license controls, public-facing README, LibreOffice and Microsoft Excel compatibility checks
 - Phase 24: portable package, clean-install verification, and CI
 - Phase 25: pre-commit audit and bilingual workbook delivery
+- Phase 26: audited first local commit
+- Phase 27: local release package and publication-readiness verification
 
 All work is confined to `ec-sales-data-automation`. `argo-core` and employer-related repositories were not modified.
 
@@ -26,9 +28,9 @@ All work is confined to `ec-sales-data-automation`. `argo-core` and employer-rel
 - Sample reconciliation: 12 input = 10 accepted + 1 duplicate + 1 rejected
 - Sample net sales: JPY 36,590
 - XLSX package: valid
-- LibreOffice: opened and exported seven pages
+- LibreOffice: opened both localized workbooks and exported them to PDF
 - Microsoft Excel for Mac: opened, seven worksheets read, closed without saving
-- Git: no commits yet; repository files are untracked
+- Git: local commits present on `main`; no remote configured
 
 ## Phase 25 result
 
@@ -38,13 +40,17 @@ Complete. The first-commit candidates passed the publication scan. Japanese and 
 
 Complete. The complete candidate set was staged and reviewed, the final automated checks passed, and the first local commit was created on `main`. No remote was configured and nothing was published.
 
-## Exact restart sequence for Phase 26
+## Phase 27 result
+
+Complete. Public metadata, changelog, release notes, release packaging, checksums, and Git-history auditing are prepared locally. No external repository, tag, release, or upload was created.
+
+## Exact restart sequence for Phase 28
 
 1. Read `AGENTS.md`, `README.md`, `docs/07_phase_status.md`, `docs/09_publication_checklist.md`, and this file.
-2. Re-run unit tests and `python3 scripts/audit_publication.py`.
-3. Review the complete prospective first-commit diff and file list.
-4. Create the first local commit only if the user explicitly requests it.
-5. Do not configure a remote, create a release, or publish without explicit user direction.
+2. Re-run tests, `scripts/audit_publication.py`, and `scripts/audit_git_history.py`.
+3. Ask the user to identify or authorize the exact hosting destination and public/private visibility.
+4. Only after authorization, configure the remote and push `main`.
+5. Separately confirm creation of tag/release `v0.1.0` and upload the checksummed workbook attachments.
 
 ## Constraints that remain binding
 

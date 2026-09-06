@@ -6,8 +6,18 @@ build-backend = "setuptools.build_meta"
 name = "ec-sales-data-automation"
 version = "0.1.0"
 description = "Normalize synthetic multi-channel EC sales CSVs and prepare an auditable sales report."
+readme = "README.md"
 requires-python = ">=3.11"
 license = { text = "MIT" }
+keywords = ["ecommerce", "csv", "data-cleaning", "sales-reporting", "excel"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+]
 
 [project.scripts]
 ec-sales = "ec_sales.cli:main"

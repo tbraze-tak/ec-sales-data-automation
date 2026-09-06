@@ -2,7 +2,7 @@
 
 [日本語](README.ja.md) | English
 
-複数のECショップから出力された、列名・日付・金額表現などが異なるCSVを、ローカル環境で統合・クレンジング・集計し、Excelレポートへ変換するポートフォリオプロジェクトです。
+A portfolio project that locally validates, normalizes, and aggregates sales CSVs with different column names, date formats, and amount representations, then prepares an auditable management report.
 
 > Different CSV layouts in, validated management workbook out.
 
@@ -10,7 +10,7 @@
 
 ## Project status
 
-- Current phase: Phase 25 complete — pre-commit audit and bilingual report verification
+- Current phase: Phase 27 complete — local release package and publication-readiness verification
 - Gate decision: **GO with conditions**
 - Implementation: synthetic sample E2E complete
 - Canonical scope: [`docs/01_product_brief.md`](docs/01_product_brief.md)
@@ -18,55 +18,47 @@
 
 ## Hard boundaries
 
-- 入力データはゼロから生成した完全合成データのみを使用する。
-- 実在企業の内部データ、顧客データ、非公開資料、コード、ログを使用しない。
-- EV、CAN、BMS、OBC、VCU、車両診断・充電器解析など本業領域を扱わない。
-- `argo-core` その他の本業関連リポジトリから、コード・設定・データをコピーしない。
-- Amazon、楽天など第三者のロゴ、画面、商標を成果物に使用しない。サンプル店舗は架空名にする。
+- Use only wholly synthetic input data created from scratch.
+- Do not use internal company data, customer data, private documents, source code, or logs.
+- Keep this project isolated from `argo-core` and all employer-related repositories.
+- Use fictional store and product names, with no third-party marketplace branding or affiliation claims.
 
 ## Target user experience
 
 ```text
-CSVを input/ に置く
+Place CSV files in input/
         ↓
-コマンドを1回実行
+Run one command
         ↓
-検証結果 + 統合データ + Excelレポートを output/ に生成
+Produce validation results + normalized data + report outputs
 ```
 
 ## Before / After
 
 Before:
 
-- 店舗ごとに列名、日付形式、ステータス表現が異なる。
-- 重複行、キャンセル、返金、不正値を手作業で判断する。
-- 毎月、同じコピー・貼り付け・集計・グラフ更新を繰り返す。
-- 集計から除外した行の理由を後から追跡しにくい。
+- Each shop exports a different schema, date format, and status vocabulary.
+- Duplicate rows, cancellations, refunds, and malformed values require manual decisions.
+- Monthly copy/paste, aggregation, and chart updates are repetitive.
+- Excluded rows are difficult to trace after the report is produced.
 
 After:
 
-- 店舗別の明示的な契約に従って共通形式へ変換する。
-- すべての入力行を「採用・重複・不正」に照合する。
-- 売上、注文数、販売数量、前月比を自動集計する。
-- Excelレポート、統合CSV、品質JSONを同時に生成する。
-- 元ファイル、元行番号、入力SHA-256を保持する。
+- Convert each configured source schema into one canonical format.
+- Reconcile every input row as accepted, duplicate, or rejected.
+- Aggregate sales, orders, units, and month-over-month movement automatically.
+- Produce normalized CSV and auditable JSON outputs; the development workflow also builds Excel demonstrations.
+- Preserve source filename, source row number, and input SHA-256 lineage.
 
 ## Documents
 
-- [`docs/00_repository_baseline.md`](docs/00_repository_baseline.md) — 初期状態と正本確認
-- [`docs/01_product_brief.md`](docs/01_product_brief.md) — 正本仕様
-- [`docs/02_competitive_research.md`](docs/02_competitive_research.md) — 競合・代替手段調査
-- [`docs/03_prior_art_and_ip.md`](docs/03_prior_art_and_ip.md) — Prior Art / IP調査
-- [`docs/04_implementation_gate.md`](docs/04_implementation_gate.md) — 実装開始判定
-- [`docs/05_data_contract.md`](docs/05_data_contract.md) — データ契約
-- [`docs/06_dependency_record.md`](docs/06_dependency_record.md) — 依存関係記録
-- [`docs/07_phase_status.md`](docs/07_phase_status.md) — Phase進捗
-- [`docs/08_compatibility_report.md`](docs/08_compatibility_report.md) — Excel互換性確認
-- [`docs/09_publication_checklist.md`](docs/09_publication_checklist.md) — 公開前チェックリスト
-- [`docs/10_distribution_decision.md`](docs/10_distribution_decision.md) — 公開配布方式
-- [`docs/11_clean_install_report.md`](docs/11_clean_install_report.md) — クリーン環境試験
-- [`docs/12_bilingual_strategy.md`](docs/12_bilingual_strategy.md) — 日英使い分け方針
-- [`docs/13_precommit_audit.md`](docs/13_precommit_audit.md) — 初回コミット前監査
+- [`docs/01_product_brief.md`](docs/01_product_brief.md) — canonical v1 scope
+- [`docs/04_implementation_gate.md`](docs/04_implementation_gate.md) — implementation decision and conditions
+- [`docs/05_data_contract.md`](docs/05_data_contract.md) — source and output contracts
+- [`docs/08_compatibility_report.md`](docs/08_compatibility_report.md) — office-suite compatibility
+- [`docs/10_distribution_decision.md`](docs/10_distribution_decision.md) — public distribution model
+- [`docs/12_bilingual_strategy.md`](docs/12_bilingual_strategy.md) — Japanese/English presentation strategy
+- [`docs/14_release_readiness.md`](docs/14_release_readiness.md) — local release package and publication boundary
 
 ## Run the portable sample
 
@@ -156,4 +148,4 @@ Project-authored source and documentation are available under the MIT License. T
 
 ## Notice
 
-本リポジトリのPrior Art / IP調査は、初期のリスクスクリーニングであり、法的意見またはFreedom-to-Operate調査ではありません。
+The Prior Art/IP review in this repository is an initial risk screen, not legal advice or a freedom-to-operate opinion.
