@@ -3,6 +3,14 @@
 Status: canonical for v1 planning
 Date: 2026-09-06
 
+## CSV Data Bridge MVP elevation
+
+The current product target is a Japanese-first local Streamlit application. A user uploads multiple supported CSV files, selects one or more outputs, converts them, and downloads either one file or a ZIP. Required outputs are canonical Clean CSV, a formula-linked Excel sales report, and a wholly fictional Accounting System DEMO CSV.
+
+The existing deterministic pipeline remains the Data Bridge Core. The UI, input detection, and output adapters must remain separate from that core. The sample dataset must contain at least 500 wholly synthetic rows across approximately twelve months, three fictional stores, and 20–30 fictional products.
+
+Workbook aggregates must be traceable to `Clean_Data`. Dashboard net sales must equal Monthly, Channel, Product, and Clean_Data net sales. Unknown CSV layouts and malformed rows must produce understandable user-facing results without exposing a Python traceback.
+
 ## Problem
 
 Small EC operators often receive sales exports from multiple channels with incompatible columns, date formats, status names, tax/shipping representation, and encodings. Repeating the cleanup and monthly summary by hand is slow and error-prone.

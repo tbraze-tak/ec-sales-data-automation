@@ -23,7 +23,7 @@ class PipelineTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             output = Path(directory)
             model = run_pipeline(
-                ROOT / "sample_data" / "input",
+                ROOT / "sample_data" / "small_input",
                 output,
                 ROOT / "config" / "source_contracts.json",
             )
@@ -54,8 +54,8 @@ class PipelineTests(unittest.TestCase):
             root = Path(directory)
             first = root / "first"
             second = root / "second"
-            run_pipeline(ROOT / "sample_data" / "input", first, ROOT / "config" / "source_contracts.json")
-            run_pipeline(ROOT / "sample_data" / "input", second, ROOT / "config" / "source_contracts.json")
+            run_pipeline(ROOT / "sample_data" / "small_input", first, ROOT / "config" / "source_contracts.json")
+            run_pipeline(ROOT / "sample_data" / "small_input", second, ROOT / "config" / "source_contracts.json")
 
             for filename in ("clean_data.csv", "quality_report.json", "report_model.json"):
                 self.assertEqual((first / filename).read_bytes(), (second / filename).read_bytes())

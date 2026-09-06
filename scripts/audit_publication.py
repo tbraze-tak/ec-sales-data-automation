@@ -23,7 +23,7 @@ PATTERNS = {
 
 def candidates():
     for path in ROOT.rglob("*"):
-        if any(part in EXCLUDED_PARTS for part in path.parts) or path.is_dir():
+        if any(part in EXCLUDED_PARTS or part.endswith(".egg-info") for part in path.parts) or path.is_dir():
             continue
         yield path
 

@@ -10,9 +10,9 @@ build/
 *.egg-info/
 
 # Runtime-generated artifacts
-input/
-output/
-outputs/
+/input/
+/output/
+/outputs/
 
 # Local secrets and configuration
 .env

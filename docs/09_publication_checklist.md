@@ -30,13 +30,15 @@
 - [x] Versioned data contract
 - [x] Explicit source adapters
 - [x] Deterministic outputs
-- [x] Eight automated tests
+- [x] Fifteen automated tests
 - [x] LibreOffice compatibility check
 - [x] Microsoft Excel for Mac smoke test
 - [x] Separate the portable Python core from development-only workbook generation
 - [x] Run installation and sample generation from an isolated clean copy
 - [x] Add CI for Python 3.11–3.13
 - [x] Add package metadata, changelog, and release notes
+- [x] Streamlit clean-install and startup smoke test
+- [x] Formula-linked Excel reconciliation across all aggregate sheets
 
 ## Claims and legal review
 

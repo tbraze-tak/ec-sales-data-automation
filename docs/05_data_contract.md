@@ -56,3 +56,13 @@ Fatal file errors are reported separately because their rows may not be safely p
 - `quality_report.json`: file and row reconciliation plus each rejection reason.
 - `report_model.json`: deterministic KPI and aggregation model used by the workbook builder.
 - `ec_sales_report.xlsx`: reader-facing report generated from the report model and clean data.
+
+## CSV Data Bridge presentation contract
+
+The downloadable Clean CSV uses these stable columns:
+
+`store`, `order_id`, `order_date`, `year_month`, `status`, `sku`, `product_name`, `quantity`, `unit_price`, `gross_sales`, `discount`, `shipping`, `tax`, `net_sales`, `source_file`.
+
+Input layout detection uses the configured required-column sets. Detection must resolve to exactly one adapter. Filenames are informative but are not required for browser uploads.
+
+The Excel report contains `Dashboard`, `Monthly`, `Channel`, `Product`, `Clean_Data`, `Data_Quality`, and `README`. Aggregate and Dashboard values are formulas referencing `Clean_Data` or a directly dependent aggregate sheet.

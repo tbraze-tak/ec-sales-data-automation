@@ -1,32 +1,28 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-if [[ $# -ne 2 ]]; then
-  echo "Usage: $0 EN_WORKBOOK JA_WORKBOOK" >&2
-  exit 2
-fi
-
-english_workbook=$1
-japanese_workbook=$2
 version=0.1.0
-release_root="outputs/release/ec-sales-data-automation-v${version}"
+source_root=${1:-outputs/csv-data-bridge-mvp}
+release_root="outputs/release/csv-data-bridge-v${version}"
+artifacts=(clean_sales_data.csv sales_report.xlsx accounting_import_demo.csv csv_data_bridge_output.zip)
 
-for workbook in "$english_workbook" "$japanese_workbook"; do
-  if [[ ! -f "$workbook" ]]; then
-    echo "Workbook not found: $workbook" >&2
+for artifact in "${artifacts[@]}"; do
+  if [[ ! -f "$source_root/$artifact" ]]; then
+    echo "Artifact not found: $source_root/$artifact" >&2
     exit 1
   fi
 done
 
 rm -rf "$release_root"
 mkdir -p "$release_root"
-cp "$english_workbook" "$release_root/ec_sales_report_en.xlsx"
-cp "$japanese_workbook" "$release_root/ec_sales_report_ja.xlsx"
+for artifact in "${artifacts[@]}"; do
+  cp "$source_root/$artifact" "$release_root/$artifact"
+done
 cp "RELEASE_NOTES_v${version}.md" "$release_root/"
 
 (
   cd "$release_root"
-  shasum -a 256 ec_sales_report_en.xlsx ec_sales_report_ja.xlsx > SHA256SUMS.txt
+  shasum -a 256 "${artifacts[@]}" > SHA256SUMS.txt
   shasum -a 256 -c SHA256SUMS.txt
 )
 

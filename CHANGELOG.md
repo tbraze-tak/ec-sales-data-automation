@@ -6,6 +6,9 @@ All notable project changes are recorded here.
 
 ### Added
 
+- Japanese-first Streamlit UI with multi-file recognition and selectable downloads.
+- Deterministic 1,024-row synthetic dataset across three stores, twelve months, and 24 products.
+- Clean CSV, formula-linked Excel, fictional Accounting DEMO, and combined ZIP output adapters.
 - Configuration-driven adapters for three fictional EC sales CSV schemas.
 - Deterministic validation, normalization, duplicate handling, aggregation, and reconciliation.
 - Portable CSV/JSON pipeline with an installable `ec-sales` command.

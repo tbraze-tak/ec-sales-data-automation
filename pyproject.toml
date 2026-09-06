@@ -19,6 +19,12 @@ classifiers = [
   "Programming Language :: Python :: 3.13",
 ]
 
+[project.optional-dependencies]
+app = [
+  "streamlit>=1.38,<2",
+  "XlsxWriter>=3.2,<4",
+]
+
 [project.scripts]
 ec-sales = "ec_sales.cli:main"
 

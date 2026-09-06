@@ -1,0 +1,5 @@
+order_no,order_date,status,sku,item,qty,unit_price,discount,shipping,tax
+N-1001,2026-07-03,shipped,P-001,Canvas Tote,2,2400,200,500,480
+N-1002,2026-07-18,paid,P-002,Ceramic Mug,1,1800,0,400,180
+N-1003,2026-08-02,cancelled,P-003,Desk Tray,1,3200,0,0,0
+N-1004,2026-08-09,shipped,P-001,Canvas Tote,3,2400,300,0,720

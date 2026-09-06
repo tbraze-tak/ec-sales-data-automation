@@ -30,6 +30,7 @@ CANONICAL_COLUMNS = [
 class Rejection:
     source_file: str
     source_row: int | None
+    order_id: str | None
     reason: str
     detail: str
 
@@ -46,6 +47,18 @@ def _match_source(filename: str, sources: dict[str, Any]) -> tuple[str, dict[str
     matches = [(key, cfg) for key, cfg in sources.items() if fnmatch.fnmatch(filename, cfg["file_pattern"])]
     if len(matches) != 1:
         raise PipelineError(f"{filename}: expected exactly one source adapter, found {len(matches)}")
+    return matches[0]
+
+
+def detect_source(columns: list[str], sources: dict[str, Any]) -> tuple[str, dict[str, Any]]:
+    """Identify one configured adapter from its required column set."""
+    available = set(columns)
+    matches = [
+        (key, cfg) for key, cfg in sources.items()
+        if set(cfg["required"]).issubset(available)
+    ]
+    if len(matches) != 1:
+        raise PipelineError(f"expected exactly one source adapter from headers, found {len(matches)}")
     return matches[0]
 
 
@@ -205,7 +218,13 @@ def _aggregate(rows: list[dict[str, Any]]) -> dict[str, Any]:
     }
 
 
-def run_pipeline(input_dir: Path, output_dir: Path, contract_path: Path) -> dict[str, Any]:
+def run_pipeline(
+    input_dir: Path,
+    output_dir: Path,
+    contract_path: Path,
+    *,
+    allow_partial: bool = False,
+) -> dict[str, Any]:
     contract = load_contract(contract_path)
     output_dir.mkdir(parents=True, exist_ok=True)
     files = sorted(input_dir.glob("*.csv"))
@@ -222,8 +241,15 @@ def run_pipeline(input_dir: Path, output_dir: Path, contract_path: Path) -> dict
 
     for path in files:
         try:
-            source_key, cfg = _match_source(path.name, contract["sources"])
-            with path.open("r", encoding=cfg["encoding"], newline="") as handle:
+            try:
+                source_key, cfg = _match_source(path.name, contract["sources"])
+                encoding = cfg["encoding"]
+            except PipelineError:
+                encoding = "utf-8-sig"
+                with path.open("r", encoding=encoding, newline="") as probe:
+                    columns = csv.DictReader(probe).fieldnames or []
+                source_key, cfg = detect_source(columns, contract["sources"])
+            with path.open("r", encoding=encoding, newline="") as handle:
                 reader = csv.DictReader(handle)
                 columns = reader.fieldnames or []
                 missing = sorted(set(cfg["required"]) - set(columns))
@@ -253,7 +279,17 @@ def run_pipeline(input_dir: Path, output_dir: Path, contract_path: Path) -> dict
                         seen[identity] = normalized
                         accepted.append(normalized)
                     except ValueError as exc:
-                        rejections.append(Rejection(path.name, row_number, "invalid_row", str(exc)))
+                        order_column = next(
+                            (source for source, target in cfg["columns"].items() if target == "order_id"),
+                            None,
+                        )
+                        rejections.append(Rejection(
+                            path.name,
+                            row_number,
+                            (raw.get(order_column) or "").strip() if order_column else None,
+                            "invalid_row",
+                            str(exc),
+                        ))
                 file_info.append({
                     "name": path.name,
                     "source": cfg["display_name"],
@@ -263,7 +299,7 @@ def run_pipeline(input_dir: Path, output_dir: Path, contract_path: Path) -> dict
         except (OSError, UnicodeError, csv.Error, PipelineError) as exc:
             fatal_files.append({"name": path.name, "error": str(exc)})
 
-    if fatal_files:
+    if fatal_files and not allow_partial:
         report = {"fatal_files": fatal_files, "input_rows": input_rows}
         (output_dir / "quality_report.json").write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
         raise PipelineError(f"fatal input errors: {len(fatal_files)} file(s)")

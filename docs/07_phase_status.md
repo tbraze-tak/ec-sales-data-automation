@@ -131,3 +131,20 @@ Status: complete
 ## Next phase
 
 Phase 28 requires explicit direction for any external action: choose the Git hosting destination and visibility, configure a remote, push, create tag `v0.1.0`, create the release, and upload the verified attachments.
+
+## Phase 28 — CSV Data Bridge MVP elevation
+
+Status: complete
+
+- Reused the deterministic normalization and validation core while separating the Streamlit UI and output adapters.
+- Added multi-file drag-and-drop, header-based adapter detection, Japanese status summaries, selectable outputs, and ZIP download.
+- Added Clean CSV, a formula-linked seven-sheet Excel report, and a fictional Accounting System DEMO CSV.
+- Expanded the synthetic sample to 1,024 rows across twelve months, three fictional stores, and 24 fictional products.
+- Linked Dashboard, Monthly, Channel, and Product to `Clean_Data` with formulas and added an independent total consistency check.
+- Expanded automated coverage from 8 to 15 tests, including CP932 input, unknown schemas, ZIP output, accounting balance, and workbook formula relationships.
+- Completed browser interaction from sample selection through three-output ZIP download.
+- Recalculated the workbook in LibreOffice and confirmed all net-sales views equal JPY 9,653,295.
+
+## Next phase
+
+Phase 29 should refresh the release package and public screenshots for CSV Data Bridge, then repeat the full publication audit. Remote creation, push, tagging, and release publication still require explicit user direction.

@@ -7,7 +7,7 @@ Target version: `v0.1.0`
 
 - Added public package metadata and a changelog.
 - Prepared concise release notes describing scope, evidence, attachments, and limitations.
-- Added a deterministic packaging script for the Japanese and English workbooks.
+- Added a deterministic packaging script for all CSV Data Bridge outputs.
 - Added SHA-256 checksum generation and verification to the package workflow.
 - Kept all release packages and generated workbooks outside Git history.
 - Re-ran tests, clean installation, repository scanning, and Git-history scanning.
@@ -16,7 +16,7 @@ Target version: `v0.1.0`
 
 Description:
 
-> Normalize incompatible EC sales CSVs into auditable CSV/JSON outputs and bilingual Excel report samples using wholly synthetic data.
+> Drag, convert, and download incompatible EC sales CSVs as clean data, a formula-linked Excel report, or a fictional accounting format.
 
 Topics:
 
@@ -29,17 +29,18 @@ The repository remains local. Creating a remote, pushing commits, making the rep
 ## Expected release package
 
 ```text
-ec-sales-data-automation-v0.1.0/
+csv-data-bridge-v0.1.0/
 ├── RELEASE_NOTES_v0.1.0.md
 ├── SHA256SUMS.txt
-├── ec_sales_report_en.xlsx
-└── ec_sales_report_ja.xlsx
+├── accounting_import_demo.csv
+├── clean_sales_data.csv
+├── csv_data_bridge_output.zip
+└── sales_report.xlsx
 ```
 
 The package is locally reproducible with:
 
 ```bash
-./scripts/package_release.sh \
-  outputs/.../ec_sales_report_en.xlsx \
-  outputs/.../ec_sales_report_ja.xlsx
+PYTHONPATH=src python3 scripts/build_mvp_demo.py
+./scripts/package_release.sh
 ```

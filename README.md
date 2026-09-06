@@ -1,16 +1,16 @@
-# EC Sales Data Automation
+# CSV Data Bridge
 
 [日本語](README.ja.md) | English
 
-A portfolio project that locally validates, normalizes, and aggregates sales CSVs with different column names, date formats, and amount representations, then prepares an auditable management report.
+A local Streamlit app that turns multiple incompatible CSV exports into a clean canonical CSV, a formula-linked Excel report, and a fictional accounting-import CSV.
 
 > Different CSV layouts in, validated management workbook out.
 
-![English sample summary](docs/assets/sample_summary_en.png)
+![CSV Data Bridge dashboard](docs/assets/csv_data_bridge_dashboard.png)
 
 ## Project status
 
-- Current phase: Phase 27 complete — local release package and publication-readiness verification
+- Current phase: Phase 28 complete — CSV Data Bridge MVP implemented and verified locally
 - Gate decision: **GO with conditions**
 - Implementation: synthetic sample E2E complete
 - Canonical scope: [`docs/01_product_brief.md`](docs/01_product_brief.md)
@@ -23,14 +23,14 @@ A portfolio project that locally validates, normalizes, and aggregates sales CSV
 - Keep this project isolated from `argo-core` and all employer-related repositories.
 - Use fictional store and product names, with no third-party marketplace branding or affiliation claims.
 
-## Target user experience
+## Operation
 
 ```text
-Place CSV files in input/
+Drop multiple CSV files
         ↓
-Run one command
+Select one or more output formats
         ↓
-Produce validation results + normalized data + report outputs
+Convert and download one file or one ZIP
 ```
 
 ## Before / After
@@ -47,7 +47,7 @@ After:
 - Convert each configured source schema into one canonical format.
 - Reconcile every input row as accepted, duplicate, or rejected.
 - Aggregate sales, orders, units, and month-over-month movement automatically.
-- Produce normalized CSV and auditable JSON outputs; the development workflow also builds Excel demonstrations.
+- Produce Clean CSV, a formula-linked Excel report, an Accounting DEMO CSV, or a ZIP.
 - Preserve source filename, source row number, and input SHA-256 lineage.
 
 ## Documents
@@ -59,6 +59,7 @@ After:
 - [`docs/10_distribution_decision.md`](docs/10_distribution_decision.md) — public distribution model
 - [`docs/12_bilingual_strategy.md`](docs/12_bilingual_strategy.md) — Japanese/English presentation strategy
 - [`docs/14_release_readiness.md`](docs/14_release_readiness.md) — local release package and publication boundary
+- [`docs/15_csv_data_bridge_mvp.md`](docs/15_csv_data_bridge_mvp.md) — MVP completion evidence
 
 ## Run the portable sample
 
@@ -93,7 +94,23 @@ Generated files are written to `output/`:
 - `quality_report.json`
 - `report_model.json`
 
-The Excel workbook is created only by the development workflow described below.
+## Run the web app
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install -r requirements.txt
+python -m streamlit run app.py
+```
+
+Open the displayed local URL, upload the three sample CSVs or select the sample-data option, choose the outputs, and press **変換する**.
+
+Available outputs:
+
+- `clean_sales_data.csv` — UTF-8 BOM canonical data
+- `sales_report.xlsx` — formula-linked Dashboard, Monthly, Channel, Product, Clean_Data, Data_Quality, and README sheets
+- `accounting_import_demo.csv` — fictional mapping demonstration, not compatible with any real accounting product
+- `csv_data_bridge_output.zip` — one download when multiple outputs are selected
 
 Run the dependency-free Python tests with:
 
@@ -105,14 +122,14 @@ PYTHONPATH=src python3 -m unittest discover -s tests -v
 
 | Measure | Result |
 |---|---:|
-| Input rows | 12 |
-| Accepted rows | 10 |
+| Input rows | 1,024 |
+| Accepted rows | 1,022 |
 | Excluded duplicate rows | 1 |
 | Rejected rows | 1 |
-| Net sales | ¥36,590 |
-| Completed orders | 8 |
+| Net sales | ¥9,653,295 |
+| Completed orders | 986 |
 
-The totals above are fixture expectations verified by automated tests. The sample intentionally contains one exact duplicate, one cancelled order, one refund, and one malformed quantity.
+The totals above are fixture expectations verified by automated tests. The twelve-month sample contains 24 fictional products, cancellations, refunds, one exact duplicate, and one malformed quantity.
 
 ## Architecture
 
@@ -135,16 +152,17 @@ CSV + JSON + Excel report
 - v1 accepts only the three documented fictional schemas.
 - All values use JPY; currency conversion is out of scope.
 - The project does not provide accounting or tax advice.
-- The workbook builder currently depends on the Codex bundled spreadsheet runtime. The Python CSV/JSON outputs are portable, while the verified workbook is a demonstration artifact.
+- The web app installs Streamlit and its Excel-writing dependency through the `app` optional dependency group.
+- Accounting DEMO is intentionally fictional and requires a customer-specific adapter for real use.
 - Portfolio development uses synthetic data only. Do not add customer or employer data.
 
 ## License
 
 Project-authored source and documentation are available under the MIT License. Third-party components retain their respective licenses.
 
-## Development workbook workflow
+## Data relationship
 
-`scripts/run_sample.sh` generates the Excel workbook only inside the configured Codex spreadsheet development environment. It is intentionally separate from the portable public command.
+The workbook uses `Clean_Data` as its calculation source. Row-level gross and net sales are formulas, Monthly/Channel/Product use `SUMIFS`, Dashboard references the aggregate sheets, and an independent Dashboard check compares all net-sales totals.
 
 ## Notice
 

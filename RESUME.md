@@ -19,14 +19,15 @@ The Codex weekly usage window reached 98% used, so work was initially stopped be
 - Phase 25: pre-commit audit and bilingual workbook delivery
 - Phase 26: audited first local commit
 - Phase 27: local release package and publication-readiness verification
+- Phase 28: CSV Data Bridge Streamlit MVP, 1,024-row sample, three outputs, ZIP, and formula-linked Excel
 
 All work is confined to `ec-sales-data-automation`. `argo-core` and employer-related repositories were not modified.
 
 ## Current verification state
 
-- Unit tests: 8 passed
-- Sample reconciliation: 12 input = 10 accepted + 1 duplicate + 1 rejected
-- Sample net sales: JPY 36,590
+- Unit tests: 15 passed
+- Sample reconciliation: 1,024 input = 1,022 accepted + 1 duplicate + 1 rejected
+- Sample net sales: JPY 9,653,295
 - XLSX package: valid
 - LibreOffice: opened both localized workbooks and exported them to PDF
 - Microsoft Excel for Mac: opened, seven worksheets read, closed without saving
@@ -44,13 +45,17 @@ Complete. The complete candidate set was staged and reviewed, the final automate
 
 Complete. Public metadata, changelog, release notes, release packaging, checksums, and Git-history auditing are prepared locally. No external repository, tag, release, or upload was created.
 
-## Exact restart sequence for Phase 28
+## Phase 28 result
+
+Complete. The portfolio now provides a Japanese-first Streamlit interface with multi-file recognition, selectable Clean CSV / formula-linked Excel / Accounting DEMO outputs, ZIP download, Data Quality results, and a 1,024-row synthetic demonstration. Browser operation and LibreOffice recalculation were verified.
+
+## Exact restart sequence for Phase 29
 
 1. Read `AGENTS.md`, `README.md`, `docs/07_phase_status.md`, `docs/09_publication_checklist.md`, and this file.
 2. Re-run tests, `scripts/audit_publication.py`, and `scripts/audit_git_history.py`.
-3. Ask the user to identify or authorize the exact hosting destination and public/private visibility.
-4. Only after authorization, configure the remote and push `main`.
-5. Separately confirm creation of tag/release `v0.1.0` and upload the checksummed workbook attachments.
+3. Refresh README screenshots and the local release bundle for CSV Data Bridge.
+4. Repeat the full file, Git-history, clean-install, workbook, and UI smoke tests.
+5. Ask the user to identify or authorize the exact hosting destination and public/private visibility before any external action.
 
 ## Constraints that remain binding
 

@@ -1,12 +1,12 @@
-# EC売上データ自動化
+# CSV Data Bridge
 
 [English / 英語](README.md)
 
-現在の状態：Phase 27完了（ローカルReleaseパッケージと公開準備監査まで完了、未公開）
+現在の状態：Phase 28完了（CSV Data Bridge MVPをローカル実装・検証済み、未公開）
 
-列名、日付形式、ステータス表現が異なる複数店舗のCSVを、共通形式へ変換して集計するポートフォリオです。開発・デモには完全合成データだけを使用しています。
+列名、日付形式、ステータス表現が異なる複数店舗のCSVをドラッグ＆ドロップし、必要な形式へまとめて変換するローカルWebアプリです。開発・デモには完全合成データだけを使用しています。
 
-![日本語サマリー](docs/assets/sample_summary_ja.png)
+![CSV Data Bridgeダッシュボード](docs/assets/csv_data_bridge_dashboard.png)
 
 ## 解決する作業
 
@@ -28,18 +28,18 @@
 統合CSV・品質JSON・集計JSON
 ```
 
-Excel見本には、日本語版と英語版があります。同じ正規化処理と同じ数値を使い、見出し、店舗名、商品名、状態だけを表示言語に合わせています。
+Excelレポートは `Clean_Data` を計算元にし、月別・店舗別・商品別・Dashboardを数式で連動させています。
 
 ## サンプル結果
 
 | 項目 | 結果 |
 |---|---:|
-| 入力行 | 12 |
-| 採用行 | 10 |
+| 入力行 | 1,024 |
+| 採用行 | 1,022 |
 | 重複行 | 1 |
 | 不正行 | 1 |
-| 純売上 | 36,590円 |
-| 完了注文数 | 8 |
+| 純売上 | 9,653,295円 |
+| 完了注文数 | 986 |
 
 サンプルには、重複、キャンセル、返金、不正な数量を意図的に含めています。
 
@@ -60,7 +60,7 @@ ec-sales --input sample_data/input --output output --contract config/source_cont
 - `quality_report.json`：採用・重複・不正の照合結果
 - `report_model.json`：集計結果
 
-Excel生成は現在、管理された開発環境で行うデモ工程です。任意のPCでExcelまで生成できるとは説明しません。
+Webアプリの追加依存関係をインストールすると、画面からExcelレポートも生成できます。
 
 ## 安全上の制約
 
@@ -77,6 +77,26 @@ PYTHONPATH=src python3 -m unittest discover -s tests -v
 ```
 
 Python 3.11〜3.13向けのCI設定も含まれています。
+
+## Web画面の起動
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install -r requirements.txt
+python -m streamlit run app.py
+```
+
+操作は次の4段階です。
+
+1. CSVを複数ドロップ、またはサンプルデータを選択
+2. Clean CSV、Excel、会計DEMOから出力形式を選択
+3. 「変換する」を押す
+4. 単一ファイルまたはZIPをダウンロード
+
+Excelの `Dashboard`、`Monthly`、`Channel`、`Product` は `Clean_Data` を数式参照します。総売上が全集計で一致することもDashboard内で独立確認します。
+
+Accounting DEMOは実在会計製品の正式仕様ではありません。実案件ではお客様の取込仕様に合わせてOutput Adapterを調整します。
 
 ## 公開成果物
 
