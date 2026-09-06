@@ -60,6 +60,7 @@ After:
 - [`docs/12_bilingual_strategy.md`](docs/12_bilingual_strategy.md) — Japanese/English presentation strategy
 - [`docs/14_release_readiness.md`](docs/14_release_readiness.md) — local release package and publication boundary
 - [`docs/15_csv_data_bridge_mvp.md`](docs/15_csv_data_bridge_mvp.md) — MVP completion evidence
+- [`docs/16_csv_data_bridge_formal_spec_v0.1.md`](docs/16_csv_data_bridge_formal_spec_v0.1.md) — formal Portfolio #1 specification v0.1
 
 ## Run the portable sample
 
