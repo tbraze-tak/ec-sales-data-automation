@@ -14,6 +14,7 @@ This repository is exclusively for the portfolio project “EC Sales Data Automa
 
 ## Source of truth
 
+- Current status and machine handoff: `docs/CURRENT_STATUS.md`
 - Product scope: `docs/01_product_brief.md`
 - Implementation decision and acceptance gates: `docs/04_implementation_gate.md`
 - When scope changes, update those documents before implementation.

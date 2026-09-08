@@ -10,9 +10,10 @@ A local Streamlit app that turns multiple incompatible CSV exports into a clean 
 
 ## Project status
 
-- Current phase: Phase 28 complete — CSV Data Bridge MVP implemented and verified locally
+- Current phase: CSV Data Bridge implementation and QA complete; portfolio publication preparation is next
 - Gate decision: **GO with conditions**
 - Implementation: synthetic sample E2E complete
+- Current status and MacBook handoff: [`docs/CURRENT_STATUS.md`](docs/CURRENT_STATUS.md)
 - Canonical scope: [`docs/01_product_brief.md`](docs/01_product_brief.md)
 - Gate record: [`docs/04_implementation_gate.md`](docs/04_implementation_gate.md)
 
@@ -52,6 +53,7 @@ After:
 
 ## Documents
 
+- [`docs/CURRENT_STATUS.md`](docs/CURRENT_STATUS.md) — current Git state, completed QA, boundaries, and safe restart steps
 - [`docs/01_product_brief.md`](docs/01_product_brief.md) — canonical v1 scope
 - [`docs/04_implementation_gate.md`](docs/04_implementation_gate.md) — implementation decision and conditions
 - [`docs/05_data_contract.md`](docs/05_data_contract.md) — source and output contracts
@@ -109,7 +111,7 @@ Open the displayed local URL, upload the three sample CSVs or select the sample-
 Available outputs:
 
 - `clean_sales_data.csv` — UTF-8 BOM canonical data
-- `sales_report.xlsx` — formula-linked Dashboard, Monthly, Channel, Product, Clean_Data, Data_Quality, and README sheets
+- `sales_report.xlsx` — formula-linked Dashboard, Monthly, Store, Product, Tax, Clean_Data, Data_Quality, and README sheets
 - `accounting_import_demo.csv` — fictional mapping demonstration, not compatible with any real accounting product
 - `csv_data_bridge_output.zip` — one download when multiple outputs are selected
 
@@ -127,8 +129,15 @@ PYTHONPATH=src python3 -m unittest discover -s tests -v
 | Accepted rows | 1,022 |
 | Excluded duplicate rows | 1 |
 | Rejected rows | 1 |
-| Net sales | ¥9,653,295 |
+| Product sales | ¥8,781,775 |
+| Refund product amount | ¥87,325 |
+| Net product sales | ¥8,694,450 |
+| Sales quantity | 2,955 |
+| Refund quantity | 28 |
+| Net quantity | 2,927 |
 | Completed orders | 986 |
+| Total billed | ¥9,619,580 |
+| Consumption tax | ¥835,730 |
 
 The totals above are fixture expectations verified by automated tests. The twelve-month sample contains 24 fictional products, cancellations, refunds, one exact duplicate, and one malformed quantity.
 
@@ -163,7 +172,7 @@ Project-authored source and documentation are available under the MIT License. T
 
 ## Data relationship
 
-The workbook uses `Clean_Data` as its calculation source. Row-level gross and net sales are formulas, Monthly/Channel/Product use `SUMIFS`, Dashboard references the aggregate sheets, and an independent Dashboard check compares all net-sales totals.
+The workbook uses `Clean_Data` as its calculation source. Monthly, Store, Product, and Tax use formula-linked aggregates, and Dashboard references the Store results. The report keeps product sales, refunds, discounts, shipping, tax, and total billed as separately named measures.
 
 ## Notice
 
