@@ -33,17 +33,11 @@ class PipelineTests(unittest.TestCase):
             self.assertEqual(model["quality"]["excluded_duplicate_rows"], 1)
             self.assertEqual(model["quality"]["rejected_rows"], 1)
             self.assertTrue(model["quality"]["reconciliation_ok"])
-            self.assertEqual(model["kpis"], {
-                "net_sales": 36590,
-                "completed_orders": 8,
-                "units": 16,
-                "average_order_value": 4574,
-                "latest_mom_change": -0.04644954618259477,
-            })
-            self.assertEqual(model["monthly"], [
-                {"month": "2026-07", "net_sales": 18730, "units": 8, "mom_change": None},
-                {"month": "2026-08", "net_sales": 17860, "units": 8, "mom_change": -0.04644954618259477},
-            ])
+            self.assertEqual(model["kpis"]["sales_quantity"], 17)
+            self.assertEqual(model["kpis"]["refund_quantity"], 1)
+            self.assertEqual(model["kpis"]["net_quantity"], 16)
+            self.assertEqual(model["kpis"]["total_billed"], 36590)
+            self.assertTrue(all(r["quantity"] > 0 for r in model["clean_data"] if r["order_status"] == "refunded"))
 
             quality = json.loads((output / "quality_report.json").read_text(encoding="utf-8"))
             self.assertTrue(quality["reconciliation_ok"])
@@ -104,8 +98,8 @@ class PipelineTests(unittest.TestCase):
     def test_conflicting_duplicate_is_rejected(self):
         headers = ["order_no", "order_date", "status", "sku", "item", "qty", "unit_price"]
         rows = [
-            ["N-1", "2026-08-01", "paid", "P-1", "Sample", "1", "1000"],
-            ["N-1", "2026-08-01", "paid", "P-1", "Sample", "2", "1000"],
+            ["N-1", "2026-08-01", "paid", "P-001", "Sample", "1", "1000"],
+            ["N-1", "2026-08-01", "paid", "P-001", "Sample", "2", "1000"],
         ]
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
@@ -120,6 +114,17 @@ class PipelineTests(unittest.TestCase):
             root = Path(directory)
             with self.assertRaisesRegex(PipelineError, "no CSV files"):
                 run_pipeline(root, root / "out", ROOT / "config" / "source_contracts.json")
+
+    def test_product_without_tax_master_entry_is_rejected(self):
+        headers = ["order_no", "order_date", "status", "sku", "item", "qty", "unit_price"]
+        row = ["N-1", "2026-08-01", "paid", "P-999", "Unknown synthetic product", "1", "1000"]
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            self.write_csv(root, "north_market_unknown_product.csv", headers, [row])
+            model = run_pipeline(root, root / "out", ROOT / "config" / "source_contracts.json")
+            self.assertEqual(model["quality"]["accepted_rows"], 0)
+            self.assertEqual(model["quality"]["rejected_rows"], 1)
+            self.assertIn("missing tax definition", model["quality"]["rejections"][0]["detail"])
 
 
 if __name__ == "__main__":

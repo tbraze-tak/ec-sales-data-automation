@@ -12,9 +12,9 @@ from .pipeline import PipelineError, detect_source, load_contract, run_pipeline
 
 
 BRIDGE_COLUMNS = [
-    "store", "order_id", "order_date", "year_month", "status", "sku",
-    "product_name", "quantity", "unit_price", "gross_sales", "discount",
-    "shipping", "tax", "net_sales", "source_file",
+    "store", "order_id", "order_date", "year_month", "status", "sku", "product_name",
+    "quantity", "unit_price", "gross_item_amount", "discount_amount", "shipping_amount",
+    "tax_category", "tax_rate", "tax_amount", "total_amount", "source_file",
 ]
 
 
@@ -49,11 +49,13 @@ def canonical_rows(model: dict) -> list[dict[str, object]]:
             "product_name": row["product_name"],
             "quantity": row["quantity"],
             "unit_price": row["unit_price"],
-            "gross_sales": row["gross_sales"],
-            "discount": row["discount_amount"],
-            "shipping": row["shipping_amount"],
-            "tax": row["tax_amount"],
-            "net_sales": row["net_sales"],
+            "gross_item_amount": row["gross_item_amount"],
+            "discount_amount": row["discount_amount"],
+            "shipping_amount": row["shipping_amount"],
+            "tax_category": row["tax_category"],
+            "tax_rate": row["tax_rate"],
+            "tax_amount": row["tax_amount"],
+            "total_amount": row["total_amount"],
             "source_file": row["source_file"],
         })
     return rows
@@ -78,7 +80,7 @@ def accounting_demo_bytes(model: dict) -> bytes:
     for row in canonical_rows(model):
         if row["status"] == "cancelled":
             continue
-        amount = row["net_sales"]
+        amount = -row["total_amount"] if row["status"] == "refunded" else row["total_amount"]
         writer.writerow({
             "transaction_date": row["order_date"],
             "document_no": row["order_id"],
@@ -86,7 +88,7 @@ def accounting_demo_bytes(model: dict) -> bytes:
             "debit_amount": amount,
             "credit_account": "Sales",
             "credit_amount": amount,
-            "tax_category": "DEMO_STANDARD",
+            "tax_category": f'DEMO_{str(row["tax_category"]).upper()}_{int(float(row["tax_rate"])*100)}PCT',
             "description": f'{row["store"]} / {row["product_name"]}',
         })
     return ("\ufeff" + buffer.getvalue()).encode("utf-8")

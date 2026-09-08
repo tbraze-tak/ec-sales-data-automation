@@ -3,6 +3,10 @@
 Status: canonical for v1 planning
 Date: 2026-09-06
 
+## Current v0.1 authority
+
+The formal specification in `16_csv_data_bridge_formal_spec_v0.1.md` governs the current CSV Data Bridge v0.1 implementation. If the legacy v1 planning terminology below conflicts with that specification, the v0.1 formal specification takes precedence.
+
 ## CSV Data Bridge MVP elevation
 
 The current product target is a Japanese-first local Streamlit application. A user uploads multiple supported CSV files, selects one or more outputs, converts them, and downloads either one file or a ZIP. Required outputs are canonical Clean CSV, a formula-linked Excel sales report, and a wholly fictional Accounting System DEMO CSV.

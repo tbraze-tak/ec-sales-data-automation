@@ -1,0 +1,2 @@
+﻿scenario,effective_from,tax_category,tax_rate,sku,quantity,unit_price
+2027年4月以降の制度変更を想定したテストケース,2027-04-01,future_food,0.01,FUTURE-FOOD-001,1,1000

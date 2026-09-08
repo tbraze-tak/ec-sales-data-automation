@@ -21,8 +21,8 @@ SENSITIVE_JAPANESE = {"氏名", "住所", "メール", "電話", "購入者", "�
 CANONICAL_COLUMNS = [
     "source_channel", "source_file", "source_row", "order_id", "order_date",
     "order_status", "product_id", "product_name", "quantity", "unit_price",
-    "discount_amount", "shipping_amount", "tax_amount", "gross_sales",
-    "net_sales", "currency"
+    "gross_item_amount", "discount_amount", "shipping_amount", "tax_category",
+    "tax_rate", "tax_amount", "total_amount", "currency"
 ]
 
 
@@ -105,6 +105,21 @@ def _integer(value: str | None, field: str) -> int:
     return result
 
 
+def _tax_definition(product_id: str, product_tax_master: dict[str, Any]) -> tuple[str, Decimal]:
+    """Read the synthetic demo tax definition from the explicit product master."""
+    definition = product_tax_master.get(product_id)
+    if not isinstance(definition, dict):
+        raise ValueError(f"missing tax definition for product_id: {product_id!r}")
+    category = str(definition.get("category") or "").strip()
+    try:
+        rate = Decimal(str(definition.get("rate")))
+    except InvalidOperation as exc:
+        raise ValueError(f"invalid tax rate for product_id: {product_id!r}") from exc
+    if not category or rate < 0 or rate > 1:
+        raise ValueError(f"invalid tax definition for product_id: {product_id!r}")
+    return category, rate
+
+
 def _normalize_row(
     source_key: str,
     cfg: dict[str, Any],
@@ -112,6 +127,7 @@ def _normalize_row(
     source_row: int,
     raw: dict[str, str],
     currency: str,
+    product_tax_master: dict[str, Any],
 ) -> dict[str, Any]:
     mapped = {target: raw.get(source) for source, target in cfg["columns"].items()}
     for field in ("order_id", "product_id", "product_name"):
@@ -128,21 +144,15 @@ def _normalize_row(
     unit_price = _decimal(mapped.get("unit_price"), "unit_price")
     discount = _decimal(mapped.get("discount_amount"), "discount_amount")
     shipping = _decimal(mapped.get("shipping_amount"), "shipping_amount")
-    tax = _decimal(mapped.get("tax_amount"), "tax_amount")
+    source_tax = _decimal(mapped.get("tax_amount"), "tax_amount")
+    product_id = mapped["product_id"].strip()
+    tax_category, tax_rate = _tax_definition(product_id, product_tax_master)
+    gross = Decimal(quantity) * unit_price
 
-    if status == "cancelled":
-        quantity_out, unit_price_out = quantity, unit_price
-        gross = net = Decimal("0")
-        discount_out = shipping_out = tax_out = Decimal("0")
-    else:
-        sign = Decimal("-1") if status == "refunded" else Decimal("1")
-        quantity_out = -quantity if status == "refunded" else quantity
-        unit_price_out = unit_price
-        discount_out = discount * sign
-        shipping_out = shipping * sign
-        tax_out = tax * sign
-        gross = Decimal(quantity) * unit_price * sign
-        net = gross - discount_out + shipping_out + tax_out
+    # Canonical data preserves source meaning. Cancelled/refunded rows remain positive.
+    # The synthetic input generator calculates tax using its explicit product tax master.
+    tax = source_tax
+    total = gross - discount + shipping + tax
 
     return {
         "source_channel": cfg["display_name"],
@@ -151,70 +161,98 @@ def _normalize_row(
         "order_id": mapped["order_id"].strip(),
         "order_date": _parse_date(mapped.get("order_date") or "", cfg["date_formats"]),
         "order_status": status,
-        "product_id": mapped["product_id"].strip(),
+        "product_id": product_id,
         "product_name": mapped["product_name"].strip(),
-        "quantity": quantity_out,
-        "unit_price": int(unit_price_out),
-        "discount_amount": int(discount_out),
-        "shipping_amount": int(shipping_out),
-        "tax_amount": int(tax_out),
-        "gross_sales": int(gross),
-        "net_sales": int(net),
+        "quantity": quantity,
+        "unit_price": int(unit_price),
+        "gross_item_amount": int(gross),
+        "discount_amount": int(discount),
+        "shipping_amount": int(shipping),
+        "tax_category": tax_category,
+        "tax_rate": float(tax_rate),
+        "tax_amount": int(tax),
+        "total_amount": int(total),
         "currency": currency,
         "_source_key": source_key,
     }
 
 
 def _aggregate(rows: list[dict[str, Any]]) -> dict[str, Any]:
-    completed_orders = {f'{r["source_channel"]}:{r["order_id"]}' for r in rows if r["order_status"] == "completed"}
-    monthly: dict[str, dict[str, int]] = defaultdict(lambda: {"net_sales": 0, "units": 0})
-    channels: dict[str, dict[str, int]] = defaultdict(lambda: {"net_sales": 0, "orders": 0, "units": 0})
-    products: dict[tuple[str, str], dict[str, int]] = defaultdict(lambda: {"net_sales": 0, "units": 0})
-    channel_orders: dict[str, set[str]] = defaultdict(set)
+    completed = [r for r in rows if r["order_status"] == "completed"]
+    refunded = [r for r in rows if r["order_status"] == "refunded"]
+    completed_orders = {f'{r["source_channel"]}:{r["order_id"]}' for r in completed}
 
-    for row in rows:
-        if row["order_status"] == "cancelled":
+    def blank():
+        return {"product_sales": 0, "refund_product_amount": 0, "net_product_sales": 0,
+                "sales_quantity": 0, "refund_quantity": 0, "net_quantity": 0,
+                "orders": 0, "total_billed": 0, "discount": 0, "shipping": 0, "tax": 0}
+
+    monthly, stores, products, taxes = {}, {}, {}, {}
+    order_sets = {
+        "monthly": defaultdict(set),
+        "stores": defaultdict(set),
+        "products": defaultdict(set),
+        "taxes": defaultdict(set),
+    }
+    for r in rows:
+        if r["order_status"] == "cancelled":
             continue
-        month = row["order_date"][:7]
-        monthly[month]["net_sales"] += row["net_sales"]
-        monthly[month]["units"] += row["quantity"]
-        channel = row["source_channel"]
-        channels[channel]["net_sales"] += row["net_sales"]
-        channels[channel]["units"] += row["quantity"]
-        if row["order_status"] == "completed":
-            channel_orders[channel].add(row["order_id"])
-        product = (row["product_id"], row["product_name"])
-        products[product]["net_sales"] += row["net_sales"]
-        products[product]["units"] += row["quantity"]
+        keys = [
+            ("monthly", monthly, r["order_date"][:7]),
+            ("stores", stores, r["source_channel"]),
+            ("products", products, (r["product_id"], r["product_name"])),
+            ("taxes", taxes, (r["tax_category"], r["tax_rate"])),
+        ]
+        for dimension, mapping, key in keys:
+            if key not in mapping: mapping[key] = blank()
+            a=mapping[key]
+            if r["order_status"] == "completed":
+                a["product_sales"] += r["gross_item_amount"]
+                a["sales_quantity"] += r["quantity"]
+                a["total_billed"] += r["total_amount"]
+                a["discount"] += r["discount_amount"]
+                a["shipping"] += r["shipping_amount"]
+                a["tax"] += r["tax_amount"]
+            elif r["order_status"] == "refunded":
+                a["refund_product_amount"] += r["gross_item_amount"]
+                a["refund_quantity"] += r["quantity"]
+                a["total_billed"] -= r["total_amount"]
+                a["discount"] -= r["discount_amount"]
+                a["shipping"] -= r["shipping_amount"]
+                a["tax"] -= r["tax_amount"]
+            a["net_product_sales"] = a["product_sales"] - a["refund_product_amount"]
+            a["net_quantity"] = a["sales_quantity"] - a["refund_quantity"]
+            if r["order_status"] == "completed":
+                order_sets[dimension][key].add((r["source_channel"], r["order_id"]))
 
-    for channel, values in channels.items():
-        values["orders"] = len(channel_orders[channel])
-
-    total_net = sum(r["net_sales"] for r in rows if r["order_status"] != "cancelled")
-    units = sum(r["quantity"] for r in rows if r["order_status"] != "cancelled")
-    order_count = len(completed_orders)
-    months = sorted(monthly)
-    monthly_rows = []
-    for index, month in enumerate(months):
-        current = monthly[month]["net_sales"]
-        previous = monthly[months[index - 1]]["net_sales"] if index else None
-        mom = None if previous in (None, 0) else (current - previous) / previous
-        monthly_rows.append({"month": month, **monthly[month], "mom_change": mom})
-
+    k=blank()
+    k.update({
+        "product_sales": sum(r["gross_item_amount"] for r in completed),
+        "refund_product_amount": sum(r["gross_item_amount"] for r in refunded),
+        "sales_quantity": sum(r["quantity"] for r in completed),
+        "refund_quantity": sum(r["quantity"] for r in refunded),
+        "completed_orders": len(completed_orders),
+        "total_billed": sum(r["total_amount"] for r in completed)-sum(r["total_amount"] for r in refunded),
+        "discount": sum(r["discount_amount"] for r in completed)-sum(r["discount_amount"] for r in refunded),
+        "shipping": sum(r["shipping_amount"] for r in completed)-sum(r["shipping_amount"] for r in refunded),
+        "tax": sum(r["tax_amount"] for r in completed)-sum(r["tax_amount"] for r in refunded),
+    })
+    k["net_product_sales"] = k["product_sales"]-k["refund_product_amount"]
+    k["net_quantity"] = k["sales_quantity"]-k["refund_quantity"]
+    for dimension, mapping in (
+        ("monthly", monthly),
+        ("stores", stores),
+        ("products", products),
+        ("taxes", taxes),
+    ):
+        for key, values in mapping.items():
+            values["orders"] = len(order_sets[dimension][key])
     return {
-        "kpis": {
-            "net_sales": total_net,
-            "completed_orders": order_count,
-            "units": units,
-            "average_order_value": round(total_net / order_count) if order_count else None,
-            "latest_mom_change": monthly_rows[-1]["mom_change"] if monthly_rows else None,
-        },
-        "monthly": monthly_rows,
-        "channels": [{"channel": key, **value} for key, value in sorted(channels.items())],
-        "products": [
-            {"product_id": key[0], "product_name": key[1], **value}
-            for key, value in sorted(products.items(), key=lambda item: (-item[1]["net_sales"], item[0][0]))
-        ],
+        "kpis": k,
+        "monthly": [{"month": key, **monthly[key]} for key in sorted(monthly)],
+        "stores": [{"store": key, **stores[key]} for key in sorted(stores)],
+        "products": [{"product_id": key[0], "product_name": key[1], **value} for key,value in sorted(products.items())],
+        "taxes": [{"tax_category": key[0], "tax_rate": key[1], **value} for key,value in sorted(taxes.items(), key=lambda x:x[0][1])],
     }
 
 
@@ -264,7 +302,13 @@ def run_pipeline(
                     file_count += 1
                     try:
                         normalized = _normalize_row(
-                            source_key, cfg, path.name, row_number, raw, contract["currency"]
+                            source_key,
+                            cfg,
+                            path.name,
+                            row_number,
+                            raw,
+                            contract["currency"],
+                            contract.get("product_tax_master", {}),
                         )
                         identity = (
                             source_key, normalized["order_id"], normalized["product_id"], normalized["order_status"]

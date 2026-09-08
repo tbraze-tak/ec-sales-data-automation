@@ -3,6 +3,10 @@
 Decision date: 2026-09-06
 Decision: **GO with conditions**
 
+## Current v0.1 authority
+
+The implementation and acceptance criteria for the current CSV Data Bridge v0.1 release are defined in `16_csv_data_bridge_formal_spec_v0.1.md`. The calculation-policy proposal below is retained as historical planning context and does not override the formal v0.1 specification.
+
 ## Gate results
 
 | Gate | Result | Basis / condition |
