@@ -4,17 +4,32 @@ CSV Data Bridge — 売上CSV自動変換デモ
 
 [English / 英語](README.md)
 
-現在の状態：実装・QA完了。次工程はPortfolio公開準備です。安全な再開手順と確定事項は [`docs/CURRENT_STATUS.md`](docs/CURRENT_STATUS.md) を参照してください。
+店舗ごとに列名・日付形式・ステータス表現が異なる売上CSVを、共通形式へ整理してExcel集計まで一括作成するデモです。毎月の転記、列の並べ替え、重複確認、集計表の更新といった定型作業を、再実行できる処理へ置き換えます。
 
-列名、日付形式、ステータス表現が異なる複数店舗のCSVをドラッグ＆ドロップし、必要な形式へまとめて変換するローカルWebアプリです。開発・デモには完全合成データだけを使用しています。
+このPortfolioでは、3店舗・1,024行の完全架空データを使用しています。実在企業・顧客・マーケットプレイスのデータやロゴは使用していません。
 
-![CSV Data Bridgeダッシュボード](docs/assets/csv_data_bridge_dashboard.png)
+![CSV Data Bridge概要画面](docs/assets/csv_data_bridge_overview.png)
 
-## 解決する作業
+## このデモで確認できること
+
+- 異なる3種類のCSVをヘッダーから判別し、1つの共通データへ変換
+- 不正行と完全重複を黙って補正せず、処理結果として明示
+- 元ファイル名・元行番号・入力ハッシュを残した追跡可能なデータ作成
+- 統合CSV、数式連動Excelレポート、会計システム取込CSV（DEMO）の出力
+- 月別・店舗別・商品別・税区分別の集計とDashboardの自動作成
+
+## 想定するご相談
 
 手作業では、店舗ごとのCSVを開き、列を並べ替え、日付・金額・キャンセル・返金を確認し、重複を除外してから集計表とグラフを更新します。
 
-本ツールは次の処理を自動化します。
+このデモは、次のようなCSV整理・Excel集計案件を想定しています。
+
+- 複数店舗や複数システムのCSVを毎月1つにまとめたい
+- 列名や日付形式の違いを一定のルールで変換したい
+- 重複、不正行、キャンセル、返金を確認できる形で処理したい
+- 集計表とグラフを手作業で更新する時間を減らしたい
+
+処理の流れ：
 
 ```text
 複数形式のCSV
@@ -27,10 +42,14 @@ CSV Data Bridge — 売上CSV自動変換デモ
       ↓
 月別・店舗別・商品別集計
       ↓
-統合CSV・品質JSON・集計JSON
+統合CSV・Excelレポート・会計取込CSV（DEMO）
 ```
 
+![CSV Data Bridge一括変換結果](docs/assets/csv_data_bridge_conversion_result.png)
+
 Excelレポートは `Clean_Data` を計算元にし、月別・店舗別・商品別・Dashboardを数式で連動させています。
+
+![CSV Data Bridge Excel Dashboard](docs/assets/csv_data_bridge_excel_dashboard.png)
 
 ## サンプル結果
 
@@ -106,6 +125,8 @@ python -m streamlit run app.py
 Excelの `Monthly`、`Store`、`Product`、`Tax` は `Clean_Data` を数式参照し、`Dashboard` は `Store` 集計を参照します。商品売上・返品・値引・送料・消費税・合計請求額を区別して表示します。
 
 Accounting DEMOは実在会計製品の正式仕様ではありません。実案件ではお客様の取込仕様に合わせてOutput Adapterを調整します。
+
+このPortfolioは、対応可能な業務の考え方と実装例を示すものです。任意のCSVへの無調整対応、本番運用、会計・税務上の正確性を保証するものではありません。
 
 ## 公開成果物
 

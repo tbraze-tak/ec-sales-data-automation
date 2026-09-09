@@ -2,11 +2,21 @@
 
 [日本語](README.ja.md) | English
 
-A local Streamlit app that turns multiple incompatible CSV exports into a clean canonical CSV, a formula-linked Excel report, and a fictional accounting-import CSV.
+A local Streamlit demonstration that turns incompatible store CSV exports into clean data and a formula-linked Excel report. It replaces recurring column rearrangement, duplicate checks, validation, and report updates with a repeatable workflow.
 
 > Different CSV layouts in, validated management workbook out.
 
-![CSV Data Bridge dashboard](docs/assets/csv_data_bridge_dashboard.png)
+The portfolio uses 1,024 rows of wholly synthetic data across three fictional stores. It contains no real company, customer, or marketplace data or branding.
+
+![CSV Data Bridge overview](docs/assets/csv_data_bridge_overview.png)
+
+## What this demo shows
+
+- Detect three configured CSV schemas from their headers and normalize them into one dataset.
+- Report malformed and exact-duplicate rows explicitly instead of silently guessing.
+- Preserve source filename, source row, and input hash for traceability.
+- Produce a clean CSV, a formula-linked Excel report, and a fictional Accounting DEMO CSV.
+- Build monthly, store, product, tax, and dashboard views automatically.
 
 ## Project status
 
@@ -33,6 +43,8 @@ Select one or more output formats
         ↓
 Convert and download one file or one ZIP
 ```
+
+![CSV Data Bridge conversion result](docs/assets/csv_data_bridge_conversion_result.png)
 
 ## Before / After
 
@@ -165,6 +177,7 @@ CSV + JSON + Excel report
 - The web app installs Streamlit and its Excel-writing dependency through the `app` optional dependency group.
 - Accounting DEMO is intentionally fictional and requires a customer-specific adapter for real use.
 - Portfolio development uses synthetic data only. Do not add customer or employer data.
+- This portfolio demonstrates an implementation approach; it does not promise no-configuration support for arbitrary CSVs, production readiness, or accounting or tax correctness.
 
 ## License
 
@@ -173,6 +186,8 @@ Project-authored source and documentation are available under the MIT License. T
 ## Data relationship
 
 The workbook uses `Clean_Data` as its calculation source. Monthly, Store, Product, and Tax use formula-linked aggregates, and Dashboard references the Store results. The report keeps product sales, refunds, discounts, shipping, tax, and total billed as separately named measures.
+
+![CSV Data Bridge Excel dashboard](docs/assets/csv_data_bridge_excel_dashboard.png)
 
 ## Notice
 
