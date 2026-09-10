@@ -1,6 +1,16 @@
-# CSV Data Bridge
+# 複数店舗の売上データを一括集計
 
-[日本語](README.ja.md) | English
+**CSV Data Bridge — 売上CSV自動変換デモ**
+
+店舗ごとに列名・日付形式・ステータス表現が異なる売上CSVを共通形式へ整理し、Excelの月別・店舗別・商品別・税区分別集計とダッシュボード作成まで自動化するPortfolioデモです。
+
+デモでは、North Market・Sakura Mall・Harbor Shopの3店舗、合計1,024行の完全架空データを使用しています。実案件では、お客様のCSV形式と希望する納品形式に合わせて変換・集計ルールを調整できます。
+
+[日本語の詳細版](README.ja.md) | [English version](#english-version)
+
+## English version
+
+### CSV Data Bridge
 
 A local Streamlit demonstration that turns incompatible store CSV exports into clean data and a formula-linked Excel report. It replaces recurring column rearrangement, duplicate checks, validation, and report updates with a repeatable workflow.
 
