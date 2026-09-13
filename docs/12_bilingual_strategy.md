@@ -22,3 +22,13 @@ English identifiers are conventional for source code, configuration, and cross-b
 - Keep generated workbooks out of Git history.
 - Attach the Japanese and English `.xlsx` files to a tagged release or upload them directly as portfolio samples.
 - Never maintain separate Japanese and English calculation code.
+
+## Implementation status — 2026-09-13
+
+- The Streamlit UI now provides a Japanese / English switch.
+- The implementation retains one application and one calculation pipeline; locale selection is limited to the presentation layer.
+- Locale selection does not change parsing, validation, aggregation, workbook generation, Accounting DEMO generation, output filenames, or result values.
+- Automated tests pass 21/21, including the language-invariance test.
+- Codex browser testing: PASS.
+- Human Acceptance Test: PASS.
+- Sakura Mall's Japanese source column names are intentionally retained as an example of an input schema; they are not untranslated UI text.
